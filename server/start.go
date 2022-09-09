@@ -40,11 +40,11 @@ import (
 	servergrpc "github.com/cosmos/cosmos-sdk/server/grpc"
 	"github.com/cosmos/cosmos-sdk/server/types"
 
-	"github.com/evmos/ethermint/indexer"
-	ethdebug "github.com/evmos/ethermint/rpc/namespaces/ethereum/debug"
-	"github.com/evmos/ethermint/server/config"
-	srvflags "github.com/evmos/ethermint/server/flags"
-	ethermint "github.com/evmos/ethermint/types"
+	"github.com/sagaxyz/ethermint/indexer"
+	ethdebug "github.com/sagaxyz/ethermint/rpc/namespaces/ethereum/debug"
+	"github.com/sagaxyz/ethermint/server/config"
+	srvflags "github.com/sagaxyz/ethermint/server/flags"
+	ethermint "github.com/sagaxyz/ethermint/types"
 )
 
 // StartCmd runs the service passed in, either stand-alone or in-process with

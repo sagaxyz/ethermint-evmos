@@ -10,7 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/common/hexutil"
 	ethtypes "github.com/ethereum/go-ethereum/core/types"
-	"github.com/evmos/ethermint/tests"
+	"github.com/sagaxyz/ethermint/tests"
 	"github.com/stretchr/testify/suite"
 )
 
@@ -627,7 +627,7 @@ func (suite *TxDataTestSuite) TestDynamicFeeTxEffectiveFee() {
 			DynamicFeeTx{
 				GasTipCap: &suite.sdkInt,
 				GasFeeCap: &suite.sdkInt,
-				GasLimit: uint64(1),
+				GasLimit:  uint64(1),
 			},
 			(&suite.sdkInt).BigInt(),
 			(&suite.sdkInt).BigInt(),
@@ -653,8 +653,8 @@ func (suite *TxDataTestSuite) TestDynamicFeeTxEffectiveCost() {
 			DynamicFeeTx{
 				GasTipCap: &suite.sdkInt,
 				GasFeeCap: &suite.sdkInt,
-				GasLimit: uint64(1),
-				Amount:   &suite.sdkZeroInt,
+				GasLimit:  uint64(1),
+				Amount:    &suite.sdkZeroInt,
 			},
 			(&suite.sdkInt).BigInt(),
 			(&suite.sdkInt).BigInt(),

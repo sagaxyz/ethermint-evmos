@@ -19,10 +19,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/evmos/ethermint/x/evm/client/cli"
-	"github.com/evmos/ethermint/x/evm/keeper"
-	"github.com/evmos/ethermint/x/evm/simulation"
-	"github.com/evmos/ethermint/x/evm/types"
+	"github.com/sagaxyz/ethermint/x/evm/client/cli"
+	"github.com/sagaxyz/ethermint/x/evm/keeper"
+	"github.com/sagaxyz/ethermint/x/evm/simulation"
+	"github.com/sagaxyz/ethermint/x/evm/types"
 )
 
 var (

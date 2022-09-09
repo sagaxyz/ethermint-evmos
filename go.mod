@@ -1,4 +1,4 @@
-module github.com/evmos/ethermint
+module github.com/sagaxyz/ethermint
 
 go 1.18
 
