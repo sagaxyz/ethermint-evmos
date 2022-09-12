@@ -24,10 +24,10 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/signing"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/evmos/ethermint/encoding"
-	"github.com/evmos/ethermint/tests"
-	"github.com/evmos/ethermint/x/evm/keeper"
-	"github.com/evmos/ethermint/x/evm/types"
+	"github.com/sagaxyz/ethermint/encoding"
+	"github.com/sagaxyz/ethermint/tests"
+	"github.com/sagaxyz/ethermint/x/evm/keeper"
+	"github.com/sagaxyz/ethermint/x/evm/types"
 )
 
 const (

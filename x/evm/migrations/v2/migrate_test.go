@@ -10,12 +10,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 
-	"github.com/evmos/ethermint/encoding"
+	"github.com/sagaxyz/ethermint/encoding"
 
-	"github.com/evmos/ethermint/app"
-	v2 "github.com/evmos/ethermint/x/evm/migrations/v2"
-	v2types "github.com/evmos/ethermint/x/evm/migrations/v2/types"
-	"github.com/evmos/ethermint/x/evm/types"
+	"github.com/sagaxyz/ethermint/app"
+	v2 "github.com/sagaxyz/ethermint/x/evm/migrations/v2"
+	v2types "github.com/sagaxyz/ethermint/x/evm/migrations/v2/types"
+	"github.com/sagaxyz/ethermint/x/evm/types"
 )
 
 func TestMigrateStore(t *testing.T) {
