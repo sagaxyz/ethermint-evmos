@@ -376,6 +376,7 @@ func (k *Keeper) ApplyMessageWithConfig(ctx sdk.Context,
 		stateDB.SetNonce(sender.Address(), msg.Nonce()+1)
 	} else {
 		ret, leftoverGas, vmErr = evm.Call(sender, *msg.To(), msg.Data(), leftoverGas, msg.Value())
+		k.Logger(ctx).Error("raw error", "error", vmErr)
 	}
 
 	refundQuotient := params.RefundQuotient
@@ -421,11 +422,18 @@ func (k *Keeper) ApplyMessageWithConfig(ctx sdk.Context,
 	// reset leftoverGas, to be used by the tracer
 	leftoverGas = msg.Gas() - gasUsed
 
+	logs := types.NewLogsFromEth(stateDB.Logs())
+
+	k.Logger(ctx).Info("tx hash", "hash", txConfig.TxHash.Hex())
+	for _, l := range logs {
+		k.Logger(ctx).Info("logs", "log", l)
+	}
+
 	return &types.MsgEthereumTxResponse{
 		GasUsed: gasUsed,
 		VmError: vmError,
 		Ret:     ret,
-		Logs:    types.NewLogsFromEth(stateDB.Logs()),
+		Logs:    logs,
 		Hash:    txConfig.TxHash.Hex(),
 	}, nil
 }
