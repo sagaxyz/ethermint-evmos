@@ -180,8 +180,16 @@ func (k *Keeper) ApplyTransaction(ctx sdk.Context, msgEth *types.MsgEthereumTx) 
 	// pass true to commit the StateDB
 	res, err := k.ApplyMessageWithConfig(tmpCtx, msg, nil, true, cfg, txConfig)
 	if err != nil {
+		k.Logger(ctx).Error("error", "err", err)
+	}
+	if err != nil {
 		return nil, errorsmod.Wrap(err, "failed to apply ethereum core message")
 	}
+
+	if res.VmError != "" {
+		k.Logger(ctx).Error("vmerror", "vmerr", res.VmError)
+	}
+	k.Logger(ctx).Info("tx hash", "hash", res.Hash)
 
 	logs := types.LogsToEthereum(res.Logs)
 
@@ -376,7 +384,6 @@ func (k *Keeper) ApplyMessageWithConfig(ctx sdk.Context,
 		stateDB.SetNonce(sender.Address(), msg.Nonce()+1)
 	} else {
 		ret, leftoverGas, vmErr = evm.Call(sender, *msg.To(), msg.Data(), leftoverGas, msg.Value())
-		k.Logger(ctx).Error("raw error", "error", vmErr)
 	}
 
 	refundQuotient := params.RefundQuotient
@@ -423,11 +430,6 @@ func (k *Keeper) ApplyMessageWithConfig(ctx sdk.Context,
 	leftoverGas = msg.Gas() - gasUsed
 
 	logs := types.NewLogsFromEth(stateDB.Logs())
-
-	k.Logger(ctx).Info("tx hash", "hash", txConfig.TxHash.Hex())
-	for _, l := range logs {
-		k.Logger(ctx).Info("logs", "log", l)
-	}
 
 	return &types.MsgEthereumTxResponse{
 		GasUsed: gasUsed,
