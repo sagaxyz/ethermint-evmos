@@ -18,12 +18,14 @@ package rpc
 import (
 	"bytes"
 	"context"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"io"
 	"math/big"
 	"net"
 	"net/http"
+	"strings"
 	"sync"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -311,9 +313,40 @@ func (s *websocketsServer) getParamsAndCheckValid(msg map[string]interface{}, ws
 	return params, true
 }
 
+type RPCRequest struct {
+	JSONRPC string          `json:"jsonrpc"`
+	ID      int             `json:"id,omitempty"`
+	Method  string          `json:"method"`
+	Params  json.RawMessage `json:"params"` // must be map[string]interface{} or []interface{}
+}
+
 // tcpGetAndSendResponse connects to the rest-server over tcp, posts a JSON-RPC request, and sends the response
 // to the client over websockets
 func (s *websocketsServer) tcpGetAndSendResponse(wsConn *wsConn, mb []byte) error {
+	var pl RPCRequest
+	err := json.Unmarshal(mb, pl)
+	if err != nil {
+		s.logger.Error("cannot unmarshal ws message", "err", err)
+	}
+	params := make([]string, 0)
+	err = json.Unmarshal(pl.Params, params)
+	if err != nil {
+		s.logger.Error("cannot unmarshal params", "err", err)
+	}
+	for _, param := range params {
+		param = strings.TrimPrefix(param, "0x")
+		byteParam, err := hex.DecodeString(param)
+		if err != nil {
+			s.logger.Error("cannot decode byte[] param", "err", err)
+		}
+		var tx ethtypes.Transaction
+		err = tx.UnmarshalBinary(byteParam)
+		if err != nil {
+			s.logger.Error("cannot decode tx from byte[] param", "err", err)
+		}
+		s.logger.Info("got tx with hash", "hash", tx.Hash())
+	}
+
 	req, err := http.NewRequestWithContext(context.Background(), "POST", "http://"+s.rpcAddr, bytes.NewBuffer(mb))
 	if err != nil {
 		return errors.Wrap(err, "Could not build request")
