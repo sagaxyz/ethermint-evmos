@@ -323,28 +323,31 @@ type RPCRequest struct {
 // tcpGetAndSendResponse connects to the rest-server over tcp, posts a JSON-RPC request, and sends the response
 // to the client over websockets
 func (s *websocketsServer) tcpGetAndSendResponse(wsConn *wsConn, mb []byte) error {
-	var pl RPCRequest
+	pl := &RPCRequest{}
 	err := json.Unmarshal(mb, pl)
 	if err != nil {
 		s.logger.Error("cannot unmarshal ws message", "err", err)
 	}
-	params := make([]string, 0)
-	err = json.Unmarshal(pl.Params, params)
-	if err != nil {
-		s.logger.Error("cannot unmarshal params", "err", err)
-	}
-	for _, param := range params {
-		param = strings.TrimPrefix(param, "0x")
-		byteParam, err := hex.DecodeString(param)
+	s.logger.Info("RPC req", "req", *pl)
+	if pl.Method == "eth_sendRawTransaction" {
+		params := make([]string, 0)
+		err = json.Unmarshal(pl.Params, &params)
 		if err != nil {
-			s.logger.Error("cannot decode byte[] param", "err", err)
+			s.logger.Error("cannot unmarshal params", "err", err)
 		}
-		var tx ethtypes.Transaction
-		err = tx.UnmarshalBinary(byteParam)
-		if err != nil {
-			s.logger.Error("cannot decode tx from byte[] param", "err", err)
+		for _, param := range params {
+			param = strings.TrimPrefix(param, "0x")
+			byteParam, err := hex.DecodeString(param)
+			if err != nil {
+				s.logger.Error("cannot decode byte[] param", "err", err)
+			}
+			tx := &ethtypes.Transaction{}
+			err = tx.UnmarshalBinary(byteParam)
+			if err != nil {
+				s.logger.Error("cannot decode tx from byte[] param", "err", err)
+			}
+			s.logger.Info("got tx with hash", "hash", tx.Hash())
 		}
-		s.logger.Info("got tx with hash", "hash", tx.Hash())
 	}
 
 	req, err := http.NewRequestWithContext(context.Background(), "POST", "http://"+s.rpcAddr, bytes.NewBuffer(mb))
