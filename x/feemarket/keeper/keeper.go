@@ -18,6 +18,7 @@ package keeper
 import (
 	"math/big"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -41,6 +42,9 @@ type Keeper struct {
 	authority sdk.AccAddress
 	// Legacy subspace
 	ss paramstypes.Subspace
+	// module specific parameter space that can be configured through governance
+	paramSpace paramtypes.Subspace
+	maxGas     sdkmath.Int
 }
 
 // NewKeeper generates new fee market module keeper
@@ -51,6 +55,8 @@ func NewKeeper(
 	if err := sdk.VerifyAddressFormat(authority); err != nil {
 		panic(err)
 	}
+	maxValue := new(big.Int).Sub(new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), big.NewInt(1))
+	maxInt := sdkmath.NewIntFromBigInt(maxValue)
 
 	return Keeper{
 		cdc:          cdc,
@@ -58,6 +64,7 @@ func NewKeeper(
 		authority:    authority,
 		transientKey: transientKey,
 		ss:           ss,
+		maxGas:       maxInt,
 	}
 }
 
