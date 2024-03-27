@@ -18,6 +18,7 @@ package keeper
 import (
 	"math/big"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -37,27 +38,31 @@ type Keeper struct {
 	// Store key required for the Fee Market Prefix KVStore.
 	storeKey     storetypes.StoreKey
 	transientKey storetypes.StoreKey
-	// the address capable of executing a MsgUpdateParams message. Typically, this should be the x/gov module account.
-	authority sdk.AccAddress
-	// Legacy subspace
-	ss paramstypes.Subspace
+	authority    sdk.AccAddress
+	// module specific parameter space that can be configured through governance
+	ss     paramstypes.Subspace
+	maxGas sdkmath.Int
 }
 
 // NewKeeper generates new fee market module keeper
 func NewKeeper(
 	cdc codec.BinaryCodec, authority sdk.AccAddress, storeKey, transientKey storetypes.StoreKey, ss paramstypes.Subspace,
 ) Keeper {
-	// ensure authority account is correctly formatted
-	if err := sdk.VerifyAddressFormat(authority); err != nil {
-		panic(err)
+	// set KeyTable if it has not already been set
+	if !ss.HasKeyTable() {
+		ss = ss.WithKeyTable(types.ParamKeyTable())
 	}
+
+	maxValue := new(big.Int).Sub(new(big.Int).Exp(big.NewInt(2), big.NewInt(256), nil), big.NewInt(1))
+	maxInt := sdkmath.NewIntFromBigInt(maxValue)
 
 	return Keeper{
 		cdc:          cdc,
 		storeKey:     storeKey,
 		authority:    authority,
-		transientKey: transientKey,
 		ss:           ss,
+		transientKey: transientKey,
+		maxGas:       maxInt,
 	}
 }
 
